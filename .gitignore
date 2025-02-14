@@ -1,0 +1,10 @@
+__pycache__
+venv
+.vscode
+
+# MacOS specific
+.DS_Store
+
+# Project specific
+*.db
+token
