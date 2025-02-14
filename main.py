@@ -8,45 +8,10 @@ def user_input() -> dict:
     return {"messages": [("user", question)]}
 
 
-def run_graph(graph, current_input, config):
-    while True:
-        for update in graph.stream(current_input, config=config, stream_mode="updates"):
-            for node_id, value in update.items():
-                if node_id == "__interrupt__":
-                    print(value[0].value)
-                    if type(value[0].value) == str:
-                        return
-                    continue
-
-                if isinstance(value, dict) and value.get("messages", []):
-                    last_message = value["messages"][-1]
-                    if (
-                        isinstance(last_message, dict)
-                        or last_message.type != "ai"
-                        or not last_message.content
-                    ):
-                        continue
-                    print(f"{node_id}: {last_message.content}")
-
-        if not graph.get_state(config).next:
-            break
-
-        feedback = input("FEEDBACK> ")
-        if not feedback.strip():
-            current_input = Command(resume={"action": "continue"})
-        else:
-            current_input = Command(
-                resume={
-                    "action": "feedback",
-                    "data": f"User requested changes: {feedback}",
-                }
-            )
-
-
 if __name__ == "__main__":
     agi = SUSUAGI(thread_id="1")
 
-    with open("SUSU AGI.png", "wb") as dest:
+    with open("docs/SUSU_AGI.png", "wb") as dest:
         dest.write(agi._graph.get_graph().draw_mermaid_png())
 
     current_input = user_input()
