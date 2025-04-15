@@ -3,7 +3,9 @@ langchain-community==0.3.17
 langchain-openai==0.3.5
 langchain==0.3.18
 langgraph==0.2.72
+selenium==4.31.0
 sqlite-vec==0.1.6
+unstructured==0.17.2
 
 # DEV
 pandas==2.2.3
