@@ -2,4 +2,4 @@ from langgraph.graph import MessagesState
 
 
 class AGIState(MessagesState):
-    knowledge: list[str]
+    knowledge: str

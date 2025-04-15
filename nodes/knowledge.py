@@ -15,13 +15,15 @@ class KnowledgeRetriever:
         knowledge = [
             document.page_content
             for document in self._store.similarity_search(
-                query=last_message.content, k=self._N_TOP_MATCHES
+                query=last_message.content,
+                k=self._N_TOP_MATCHES,
+                filter={"relevant": True},
             )
         ]
 
-        return {"knowledge": knowledge}
+        return {"knowledge": "<knowledge>\n" + "\n".join(knowledge) + "\n</knowledge>"}
 
-    _N_TOP_MATCHES = 3
+    _N_TOP_MATCHES = 5
 
 
 class KnowledgeSaver:
