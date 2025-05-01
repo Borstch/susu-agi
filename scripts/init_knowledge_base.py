@@ -1,7 +1,13 @@
+from datetime import datetime, timedelta
+
 import pandas as pd
 from langchain_core.documents import Document
 
 from store import get_vectore_store
+
+
+def _get_current_date() -> str:
+    return (datetime.today() - timedelta(days=10)).strftime("%Y-%m-%d")
 
 
 def main():
@@ -15,7 +21,7 @@ def main():
             relevance, content = knowledge_piece.split("|")
             documents.append(
                 Document(
-                    page_content=content,
+                    page_content=f"Получено {_get_current_date()}:\n\n\n" + content,
                     metadata={
                         "question_id": question_id,
                         "relevant": bool(int(relevance)),

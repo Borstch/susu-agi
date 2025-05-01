@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from inspect import signature
 from pathlib import Path
 
@@ -6,6 +7,10 @@ from langchain_core.tools import BaseTool
 from langchain_openai import ChatOpenAI
 
 from state import AGIState
+
+
+def _get_current_date() -> str:
+    return (datetime.now(timezone.utc)).strftime("%Y-%m-%d")
 
 
 def _render_text_description(tools: list[BaseTool]) -> str:
@@ -63,6 +68,7 @@ class ExecutionAgent:
         ).partial(
             tools=_render_text_description(list(tools)),
             tool_names=", ".join([t.name for t in tools]),
+            today=_get_current_date(),
         )
 
     _system_prompt_path = Path("prompts/system/execution_agent.txt")

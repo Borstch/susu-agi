@@ -1,5 +1,11 @@
+from datetime import datetime, timezone
+
 from state import AGIState
 from store import get_vectore_store
+
+
+def _get_current_date() -> str:
+    return (datetime.now(timezone.utc)).strftime("%Y-%m-%d")
 
 
 class KnowledgeRetriever:
@@ -34,4 +40,8 @@ class KnowledgeSaver:
         last_message = state["messages"][-1]
         assert last_message.type == "tool" and isinstance(last_message.content, str)
 
-        self._store.add_texts(last_message.content.split("snippet: ")[1:])
+        knowledge = [
+            f"Получено {_get_current_date()}:\n\n\n" + knowledge_piece
+            for knowledge_piece in last_message.content.strip().split("snippet: ")
+        ][1:]
+        self._store.add_texts(knowledge)
