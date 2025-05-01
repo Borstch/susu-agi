@@ -20,7 +20,7 @@ if __name__ == "__main__":
         if (next_node := agi.get_next_node_name()) is None:
             break
 
-        print(output.content or output.tool_calls)  # type: ignore
+        print(output.content)
         match next_node:
             case "human_review":
                 feedback = input("FEEDBACK> ")

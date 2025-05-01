@@ -8,6 +8,7 @@ from langgraph.prebuilt import ToolNode
 from langgraph.types import Command
 from typing_extensions import Literal
 
+from nodes.beautifier import ToolCallBeautifier
 from nodes.execution_agent import ExecutionAgent
 from nodes.human import QuestionBuilder, ReviewerBuilder
 from nodes.knowledge import KnowledgeRetriever, KnowledgeSaver
@@ -35,13 +36,15 @@ class SUSUAGI:
         builder.add_node("retrieval", KnowledgeRetriever())
         builder.add_node("next_question", question_node_builder.build())
         builder.add_node("execution_agent", ExecutionAgent(self._tools))
+        builder.add_node("tool_call_beautifier", ToolCallBeautifier())
         builder.add_node("tools", ToolNode(tools=self._tools))
         builder.add_node("human_review", review_node_builder.build())
         builder.add_node("knowledge_agent", KnowledgeSaver())
 
         builder.add_edge(START, "retrieval")
         builder.add_edge("retrieval", "execution_agent")
-        builder.add_conditional_edges("execution_agent", _route_after_llm)
+        builder.add_edge("execution_agent", "tool_call_beautifier")
+        builder.add_conditional_edges("tool_call_beautifier", _route_after_llm)
         builder.add_edge("tools", "knowledge_agent")
         builder.add_edge("knowledge_agent", "execution_agent")
 
