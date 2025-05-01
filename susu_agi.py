@@ -36,7 +36,7 @@ class SUSUAGI:
         builder.add_node("retrieval", KnowledgeRetriever())
         builder.add_node("next_question", question_node_builder.build())
         builder.add_node("execution_agent", ExecutionAgent(self._tools))
-        builder.add_node("tool_call_beautifier", ToolCallBeautifier())
+        builder.add_node("tool_call_beautifier", ToolCallBeautifier(self._tools))
         builder.add_node("tools", ToolNode(tools=self._tools))
         builder.add_node("human_review", review_node_builder.build())
         builder.add_node("knowledge_agent", KnowledgeSaver())
