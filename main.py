@@ -1,3 +1,4 @@
+from langchain_core.runnables.graph import CurveStyle
 from langgraph.types import Command
 
 from susu_agi import SUSUAGI
@@ -12,7 +13,9 @@ if __name__ == "__main__":
     agi = SUSUAGI(thread_id="1")
 
     with open("docs/SUSU_AGI.png", "wb") as dest:
-        dest.write(agi._graph.get_graph().draw_mermaid_png())
+        dest.write(
+            agi._graph.get_graph().draw_mermaid_png(curve_style=CurveStyle.NATURAL)
+        )
 
     current_input = user_input()
     while True:

@@ -16,37 +16,39 @@ from state import AGIState
 from tools.url_reader import read_url
 
 
-def _route_after_llm(state: AGIState) -> Literal["next_question", "human_review"]:
+def _route_after_llm(
+    state: AGIState,
+) -> Literal["Модуль контроля диалога", "Модуль интерактивного контроля"]:
     if len(state["messages"][-1].tool_calls) == 0:  # type: ignore
-        return "next_question"
+        return "Модуль контроля диалога"
     else:
-        return "human_review"
+        return "Модуль интерактивного контроля"
 
 
 class SUSUAGI:
     def __init__(self, thread_id: str):
         builder = StateGraph(AGIState)
         question_node_builder = QuestionBuilder(
-            approved_path="retrieval", rejected_path=END
+            approved_path="Модуль извлечения знаний", rejected_path=END
         )
         review_node_builder = ReviewerBuilder(
-            approved_path="tools", rejected_path="execution_agent"
+            approved_path="Окружение", rejected_path="Процессор "
         )
 
-        builder.add_node("retrieval", KnowledgeRetriever())
-        builder.add_node("next_question", question_node_builder.build())
-        builder.add_node("execution_agent", ExecutionAgent(self._tools))
-        builder.add_node("tool_call_beautifier", ToolCallBeautifier(self._tools))
-        builder.add_node("tools", ToolNode(tools=self._tools))
-        builder.add_node("human_review", review_node_builder.build())
-        builder.add_node("knowledge_agent", KnowledgeSaver())
+        builder.add_node("Модуль извлечения знаний", KnowledgeRetriever())
+        builder.add_node("Модуль контроля диалога", question_node_builder.build())
+        builder.add_node("Процессор ", ExecutionAgent(self._tools))
+        builder.add_node("Модуль вежливости ", ToolCallBeautifier(self._tools))
+        builder.add_node("Окружение", ToolNode(tools=self._tools))
+        builder.add_node("Модуль интерактивного контроля", review_node_builder.build())
+        builder.add_node("Модуль самообучения", KnowledgeSaver())
 
-        builder.add_edge(START, "retrieval")
-        builder.add_edge("retrieval", "execution_agent")
-        builder.add_edge("execution_agent", "tool_call_beautifier")
-        builder.add_conditional_edges("tool_call_beautifier", _route_after_llm)
-        builder.add_edge("tools", "knowledge_agent")
-        builder.add_edge("knowledge_agent", "execution_agent")
+        builder.add_edge(START, "Модуль извлечения знаний")
+        builder.add_edge("Модуль извлечения знаний", "Процессор ")
+        builder.add_edge("Процессор ", "Модуль вежливости ")
+        builder.add_conditional_edges("Модуль вежливости ", _route_after_llm)
+        builder.add_edge("Окружение", "Модуль самообучения")
+        builder.add_edge("Модуль самообучения", "Процессор ")
 
         memory = MemorySaver()
 
